@@ -11,6 +11,7 @@ import {
 import { useSignalConnection } from "./hooks/useSignalConnection2";
 import { GestureController } from "./components/GestureController";
 import { toast, Toaster } from "react-hot-toast";
+import ShowImage from "./components/ShowImage";
 
 const SignalModal = ({ signal, onClose, onCopy }) => {
   const [copied, setCopied] = useState(false);
@@ -62,114 +63,149 @@ const SignalModal = ({ signal, onClose, onCopy }) => {
   const Icon = config.icon;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
-      <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl shadow-2xl max-w-2xl w-full border border-slate-700 animate-slideUp">
-        {/* Header */}
-        <div
-          className={`flex items-center justify-between p-6 border-b ${config.borderColor} border-opacity-30`}
-        >
-          <div className="flex items-center gap-3">
-            <div className={`${config.iconBg} p-2.5 rounded-lg`}>
-              <Icon className="w-5 h-5 text-white" />
+    <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl shadow-2xl max-w-2xl w-full border border-slate-700 animate-slideUp">
+      {/* Header */}
+      <div
+        className={`flex items-center justify-between p-6 border-b ${config.borderColor} border-opacity-30`}
+      >
+        <div className="flex items-center gap-3">
+          <div className={`${config.iconBg} p-2.5 rounded-lg`}>
+            <Icon className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className={`text-sm font-semibold ${config.accentColor}`}>
+                {config.label}
+              </span>
+              <span className="text-xs text-slate-400">
+                • {Math.round(signal.confidence * 100)}% confidence
+              </span>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className={`text-sm font-semibold ${config.accentColor}`}>
-                  {config.label}
-                </span>
-                <span className="text-xs text-slate-400">
-                  • {Math.round(signal.confidence * 100)}% confidence
-                </span>
-              </div>
-              <p className="text-xs text-slate-500 mt-0.5">
-                {new Date(signal.timestamp).toLocaleTimeString()}
+            <p className="text-xs text-slate-500 mt-0.5">
+              {new Date(signal.timestamp).toLocaleTimeString()}
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={onClose}
+          className="text-slate-400 hover:text-white transition-colors p-2 hover:bg-slate-700 rounded-lg"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* Content */}
+      <div className="p-6 space-y-5">
+        {/* Title */}
+        <div>
+          <h2 className="text-xl font-semibold text-white leading-tight">
+            {signal.title}
+          </h2>
+        </div>
+
+        {/* Description */}
+        <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+          <p className="text-sm font-medium text-slate-300 mb-2">
+            What's happening:
+          </p>
+          <p className="text-slate-200 leading-relaxed">{signal.description}</p>
+        </div>
+
+        {/* Suggested Response */}
+        {signal.suggestedResponse && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-slate-300">
+                💡 AI Suggested Response:
               </p>
             </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-slate-400 hover:text-white transition-colors p-2 hover:bg-slate-700 rounded-lg"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
 
-        {/* Content */}
-        <div className="p-6 space-y-5">
-          {/* Title */}
-          <div>
-            <h2 className="text-xl font-semibold text-white leading-tight">
-              {signal.title}
-            </h2>
-          </div>
+            <div className="relative bg-gradient-to-br from-slate-800 to-slate-900 rounded-lg p-4 border border-slate-600">
+              <p className="text-white leading-relaxed mb-4 pr-8">
+                "{signal.suggestedResponse}"
+              </p>
 
-          {/* Description */}
-          <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
-            <p className="text-sm font-medium text-slate-300 mb-2">
-              What's happening:
-            </p>
-            <p className="text-slate-200 leading-relaxed">
-              {signal.description}
-            </p>
-          </div>
-
-          {/* Suggested Response */}
-          {signal.suggestedResponse && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-slate-300">
-                  💡 AI Suggested Response:
-                </p>
-              </div>
-
-              <div className="relative bg-gradient-to-br from-slate-800 to-slate-900 rounded-lg p-4 border border-slate-600">
-                <p className="text-white leading-relaxed mb-4 pr-8">
-                  "{signal.suggestedResponse}"
-                </p>
-
-                <button
-                  onClick={handleCopy}
-                  className={`absolute bottom-4 right-4 flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
-                    copied
-                      ? "bg-emerald-600 text-white"
-                      : "bg-blue-600 hover:bg-blue-500 text-white"
-                  }`}
-                >
-                  {copied ? (
-                    <>
-                      <Check className="w-4 h-4" />
-                      <span className="text-sm">Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-4 h-4" />
-                      <span className="text-sm">Copy Response</span>
-                    </>
-                  )}
-                </button>
-              </div>
+              <button
+                onClick={handleCopy}
+                className={`absolute bottom-4 right-4 flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                  copied
+                    ? "bg-emerald-600 text-white"
+                    : "bg-blue-600 hover:bg-blue-500 text-white"
+                }`}
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-4 h-4" />
+                    <span className="text-sm">Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4" />
+                    <span className="text-sm">Copy Response</span>
+                  </>
+                )}
+              </button>
             </div>
-          )}
-        </div>
+          </div>
+        )}
+      </div>
 
-        {/* Footer */}
-        <div className="px-6 py-4 bg-slate-900/50 border-t border-slate-700 rounded-b-2xl">
-          <p className="text-xs text-slate-400 text-center">
-            This suggestion is AI-generated. Please review before using.
-          </p>
-        </div>
+      {/* Footer */}
+      <div className="px-6 py-4 bg-slate-900/50 border-t border-slate-700 rounded-b-2xl">
+        <p className="text-xs text-slate-400 text-center">
+          This suggestion is AI-generated. Please review before using.
+        </p>
       </div>
     </div>
   );
 };
 
 function App() {
-  const { connect, startListening, stopListening, signals, status } =
+//   const defaultSignals = [
+//   {
+//     type: "DECISION_POINT",
+//     title: "Decide on Project Budget",
+//     description: "The team needs to finalize the budget for Q1.",
+//     suggestedResponse: "Approve $50,000 budget for Q1.",
+//     confidence: 0.85,
+//     timestamp: Date.now() - 60000,
+//   },
+//   {
+//     type: "RISK_DETECTED",
+//     title: "Potential Delay in Delivery",
+//     description: "Supplier might deliver components late.",
+//     suggestedResponse: "Follow up with supplier immediately.",
+//     confidence: 0.78,
+//     timestamp: Date.now() - 30000,
+//   },
+//   {
+//     type: "IMAGE_GENERATED",
+//     title: "Visual Diagram Generated",
+//     description: "System generated a diagram based on discussion.",
+//     suggestedResponse: "Share diagram with team.",
+//     confidence: 0.92,
+//     timestamp: Date.now(),
+//     imageBase64: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA..." // sample base64
+//   }
+// ];
+
+  const { connect, startListening, stopListening, 
+    signals, 
+    status 
+  } =
     useSignalConnection();
 
   const [currentSignal, setCurrentSignal] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [latestSuggestion, setLatestSuggestion] = useState(null);
+  const [currentSignalIndex, setCurrentSignalIndex] = useState(null);
+//  const [signals, setSignals] = useState(defaultSignals);
+//   const [status, setStatus] = useState("LISTENING"); // simulate listening
+//   const [currentSignalIndex, setCurrentSignalIndex] = useState(0);
+//   const [showModal, setShowModal] = useState(true);
+//   const [latestSuggestion, setLatestSuggestion] = useState(
+//     defaultSignals[0].suggestedResponse
+//   );
 
   // Update latest suggestion when new signals arrive
   useEffect(() => {
@@ -179,13 +215,17 @@ function App() {
   }, [signals]);
 
   // Show modal when new signal arrives
-  useEffect(() => {
-    if (signals.length > 0) {
-      const latestSignal = signals[0];
-      setCurrentSignal(latestSignal);
-      setShowModal(true);
-    }
-  }, [signals]);
+ useEffect(() => {
+  if (signals.length > 0) {
+    const newestIndex = signals.length - 1;
+    setCurrentSignalIndex(newestIndex);
+    setCurrentSignal(signals[newestIndex]);
+    setShowModal(true);
+  }
+}, [signals]);
+
+
+
 
   const handleCopyResponse = (text) => {
     navigator.clipboard.writeText(text);
@@ -230,7 +270,7 @@ function App() {
 
   return (
     <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 min-h-screen text-white font-sans">
-       <Toaster position="top-center" />
+      <Toaster position="top-center" />
       {/* HEADER */}
       <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-6 py-4">
@@ -247,7 +287,7 @@ function App() {
               </div>
               <div>
                 <h1 className="text-lg font-bold text-white">
-                  Meeting Co-Pilot
+                  Signal
                 </h1>
                 <p className="text-xs text-slate-400">
                   AI-Powered Meeting Assistant
@@ -315,7 +355,7 @@ function App() {
             <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <Volume2 className="w-8 h-8 text-blue-400" />
             </div>
-            <h2 className="text-6xl  mb-2">Welcome to Meeting Co-Pilot</h2>
+            <h2 className="text-6xl  mb-2">Welcome to Signal</h2>
             <p className="text-slate-400 max-w-md mx-auto">
               Connect to start receiving real-time meeting insights, important
               decisions, and AI-powered response suggestions.
@@ -376,9 +416,10 @@ function App() {
                   <button
                     key={index}
                     onClick={() => {
-                      setCurrentSignal(signal);
-                      setShowModal(true);
-                    }}
+  setCurrentSignalIndex(index);
+  setShowModal(true);
+}}
+
                     className="bg-slate-800/50 hover:bg-slate-800 border border-slate-700 rounded-lg p-4 text-left transition-all group"
                   >
                     <div className="flex items-center justify-between">
@@ -410,18 +451,60 @@ function App() {
       </main>
 
       {/* SIGNAL MODAL */}
-      {showModal && currentSignal && (
+      {/* {showModal && currentSignal && (
         <SignalModal
           signal={currentSignal}
           onClose={() => setShowModal(false)}
           onCopy={handleCopyResponse}
         />
-      )}
+      )} */}
+
+   {showModal && currentSignalIndex !== null && (
+  <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 p-4 flex items-center justify-center">
+    <div className="flex flex-col lg:flex-row gap-6 w-full max-w-6xl items-start justify-center animate-fadeIn">
+
+      {/* LEFT — Show previous signal if newest is IMAGE_GENERATED */}
+      {(() => {
+        const current = signals[currentSignalIndex];
+        const prevIndex = currentSignalIndex - 1;
+
+        const signalAtLeft =
+          current.type === "IMAGE_GENERATED" && prevIndex >= 0
+            ? signals[prevIndex]   // previous signal
+            : current;             // otherwise show current
+
+        return (
+          <SignalModal
+            key={signalAtLeft.timestamp}
+            signal={signalAtLeft}
+            onClose={() => setShowModal(false)}
+            onCopy={handleCopyResponse}
+          />
+        );
+      })()}
+
+      {/* RIGHT — Show image only if newest signal is IMAGE_GENERATED */}
+      {signals[currentSignalIndex].type === "IMAGE_GENERATED" &&
+        signals[currentSignalIndex].imageBase64 && (
+          <ShowImage
+            key={signals[currentSignalIndex].timestamp}
+            imageBase64={signals[currentSignalIndex].imageBase64}
+            timestamp={signals[currentSignalIndex].timestamp}
+            onClose={() => setShowModal(false)}
+          />
+        )}
+    </div>
+  </div>
+)}
+
+
 
       {/* GESTURE OVERLAY (Bottom Right) */}
       {status === "LISTENING" && (
-        <GestureController onGesture={handleGesture}    
-        isReady={!!latestSuggestion} /> // Only show "👍 Copy" prompt if there is text to copy />
+        <GestureController
+          onGesture={handleGesture}
+          isReady={!!latestSuggestion}
+        /> // Only show "👍 Copy" prompt if there is text to copy />
       )}
 
       <style>{`
