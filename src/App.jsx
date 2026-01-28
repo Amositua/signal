@@ -64,7 +64,7 @@ const SignalModal = ({ signal, onClose, onCopy }) => {
 
   return (
     <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl shadow-2xl max-w-2xl w-full border border-slate-700 animate-slideUp">
-      {/* Header */}
+   
       <div
         className={`flex items-center justify-between p-6 border-b ${config.borderColor} border-opacity-30`}
       >
@@ -94,16 +94,16 @@ const SignalModal = ({ signal, onClose, onCopy }) => {
         </button>
       </div>
 
-      {/* Content */}
+
       <div className="p-6 space-y-5">
-        {/* Title */}
+ 
         <div>
           <h2 className="text-xl font-semibold text-white leading-tight">
             {signal?.title}
           </h2>
         </div>
 
-        {/* Description */}
+       
         <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
           <p className="text-sm font-medium text-slate-300 mb-2">
             What's happening:
@@ -111,7 +111,7 @@ const SignalModal = ({ signal, onClose, onCopy }) => {
           <p className="text-slate-200 leading-relaxed">{signal?.description}</p>
         </div>
 
-        {/* Suggested Response */}
+       
         {signal?.suggestedResponse && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
@@ -150,7 +150,7 @@ const SignalModal = ({ signal, onClose, onCopy }) => {
         )}
       </div>
 
-      {/* Footer */}
+     
       <div className="px-6 py-4 bg-slate-900/50 border-t border-slate-700 rounded-b-2xl">
         <p className="text-xs text-slate-400 text-center">
           This suggestion is AI-generated. Please review before using.
@@ -163,31 +163,33 @@ const SignalModal = ({ signal, onClose, onCopy }) => {
 function App() {
     const [currentSignal, setCurrentSignal] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [latestSuggestion, setLatestSuggestion] = useState(null);
+  // const [latestSuggestion, setLatestSuggestion] = useState(null);
   const [currentSignalIndex, setCurrentSignalIndex] = useState(null);
-//  const [signals, setSignals] = useState([]);
-//   const [status, setStatus] = useState("LISTENING"); // simulate listening
-//   const [currentSignalIndex, setCurrentSignalIndex] = useState(0);
-//   const [showModal, setShowModal] = useState(true);
-//   const [latestSuggestion, setLatestSuggestion] = useState();
+  const currentSignalIndexRef = useRef(currentSignalIndex);
 
-  // useEffect(() => {
-  // const interval = setInterval(async () => {
-  //   const res = await fetch("http://localhost:5000/api/next-signal");
-  //   const data = await res.json();
-  //   console.log("Polled data:", data);
-  //   if (data.signal) {
-  //     setSignals((prev) => [data.signal, ...prev]);
-  //     // setCurrentSignalIndex(prev => prev.length); // always show newest
-  //     // setShowModal(true);
-  //   //   const newestIndex = signals.length - 1;
-  //   // setCurrentSignalIndex(newestIndex);
-  //   // setCurrentSignal(signals[newestIndex]);
-  //   setShowModal(true);
-  //     setLatestSuggestion(data.signal.suggestedResponse);
-  //   }
-  //   // console.log("Polled for new signal:", data);
-  // }, 5000); // every 5 seconds
+//  const [signals, setSignals] = useState([]);
+  // const [status, setStatus] = useState("LISTENING"); // simulate listening
+  // const [currentSignalIndex, setCurrentSignalIndex] = useState(0);
+  // const [showModal, setShowModal] = useState(true);
+  // const [latestSuggestion, setLatestSuggestion] = useState();
+
+//   useEffect(() => {
+//   const interval = setInterval(async () => {
+//     const res = await fetch("http://localhost:5000/api/next-signal");
+//     const data = await res.json();
+//     console.log("Polled data:", data);
+//     if (data.signal) {
+//       setSignals((prev) => [...prev, data.signal]);
+//       // setCurrentSignalIndex(prev => prev.length); // always show newest
+//       // setShowModal(true);
+//     //   const newestIndex = signals.length - 1;
+//     // setCurrentSignalIndex(newestIndex);
+//     // setCurrentSignal(signals[newestIndex]);
+//     setShowModal(true);
+//       // setLatestSuggestion(data.signal.suggestedResponse);
+//     }
+//     // console.log("Polled for new signal:", data);
+//   }, 5000); // every 5 seconds
 
 //   return () => clearInterval(interval);
 // }, []);
@@ -197,17 +199,30 @@ function App() {
     status 
   } =
     useSignalConnection();
+const signalsRef = useRef(signals);
+useEffect(() => {
+  signalsRef.current = signals;
+}, [signals]);
 
 
+ 
+  // useEffect(() => {
+  //   if (signals.length > 0 ) {
+  //     const suggestedResponse = signals.map(s => s.suggestedResponse);
+  //     setLatestSuggestion(suggestedResponse);
+  //     console.log("Latest Suggested Response:", suggestedResponse);
+  //   }
+  // }, [signals]);
 
   // Update latest suggestion when new signals arrive
-  useEffect(() => {
-    if (signals.length > 0 && signals[0].suggestedResponse) {
-      setLatestSuggestion(signals[0].suggestedResponse);
-    }
-  }, [signals]);
+  // useEffect(() => {
+  //   if (signals.length > 0 && signals[0].suggestedResponse) {
+  //     setLatestSuggestion(signals[0].suggestedResponse);
+  //     console.log("Latest Suggested Response:", signals[0].suggestedResponse);
+  //   }
+  // }, [signals]);
 
-  // Show modal when new signal arrives
+
  useEffect(() => {
   if (signals.length > 0) {
     const newestIndex = signals.length - 1;
@@ -217,20 +232,34 @@ function App() {
   }
 }, [signals]);
 
+useEffect(() => {
+  currentSignalIndexRef.current = currentSignalIndex;
+}, [currentSignalIndex]);
 
   const handleCopyResponse = (text) => {
     navigator.clipboard.writeText(text);
   };
 
-  const handleGesture = (command) => {
-    if (command === "COPY_RESPONSE" && latestSuggestion) {
-      // 1. Copy to Clipboard
-      navigator.clipboard.writeText(latestSuggestion);
+// console.log('Current Signal Index in App:', currentSignalIndex);
 
-      // 2. Play "Success" Sound (Accessibility)
+
+const handleGesture = (command) => {
+     if (command === "COPY_RESPONSE") {
+    const index = currentSignalIndexRef.current;
+    const allSignals = signalsRef.current; 
+    const activeSignal = allSignals[index];
+
+    console.log("Correct Index:", index);
+    console.log("Signals Length:", allSignals.length);
+    console.log("Active Signal:", activeSignal);
+
+    if (!activeSignal?.suggestedResponse) return;
+
+    navigator.clipboard.writeText(activeSignal.suggestedResponse);
+
       new Audio("/success.mp3").play().catch(() => null);
 
-      // 3. Show "Wow" Visual Feedback
+
       toast.custom(
         (t) => (
           <div
@@ -262,11 +291,11 @@ function App() {
   return (
     <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 min-h-screen text-white font-sans">
       <Toaster position="top-center" />
-      {/* HEADER */}
+  
       <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            {/* Logo & Title */}
+   
             <div className="flex items-center gap-3">
               <div className="relative">
                 <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
@@ -286,7 +315,7 @@ function App() {
               </div>
             </div>
 
-            {/* Status & Controls */}
+     
             <div className="flex items-center gap-4">
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-800 rounded-full">
                 <div
@@ -339,7 +368,7 @@ function App() {
         </div>
       </header>
 
-      {/* MAIN CONTENT */}
+
       <main className="max-w-4xl mx-auto px-6 py-12">
         {status === "DISCONNECTED" && (
           <div className="text-center py-20">
@@ -441,7 +470,7 @@ function App() {
         )}
       </main>
 
-      {/* SIGNAL MODAL */}
+
       {/* {showModal && currentSignal && (
         <SignalModal
           signal={currentSignal}
@@ -454,15 +483,14 @@ function App() {
   <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 p-4 flex items-center justify-center">
     <div className="flex flex-col lg:flex-row gap-6 w-full max-w-6xl items-start justify-center animate-fadeIn">
 
-      {/* LEFT — Show previous signal if newest is IMAGE_GENERATED */}
       {(() => {
         const current = signals[currentSignalIndex];
         const prevIndex = currentSignalIndex - 1;
 
         const signalAtLeft =
           current?.type === "IMAGE_GENERATED" && prevIndex >= 0
-            ? signals[prevIndex]   // previous signal
-            : current;             // otherwise show current
+            ? signals[prevIndex]   
+            : current;             
 
         return (
           <SignalModal
@@ -474,7 +502,7 @@ function App() {
         );
       })()}
 
-      {/* RIGHT — Show image only if newest signal is IMAGE_GENERATED */}
+   
       {signals[currentSignalIndex]?.type === "IMAGE_GENERATED" &&
         signals[currentSignalIndex]?.imageBase64 && (
           <ShowImage
@@ -487,15 +515,13 @@ function App() {
     </div>
   </div>
 )}
-
-
-
-      {/* GESTURE OVERLAY (Bottom Right) */}
+  
       {status === "LISTENING" && (
         <GestureController
-          onGesture={handleGesture}
-          isReady={!!latestSuggestion}
-        /> // Only show "👍 Copy" prompt if there is text to copy />
+  onGesture={handleGesture}
+  isReady={!!signals[currentSignalIndex]?.suggestedResponse}
+/>
+
       )}
 
       <style>{`

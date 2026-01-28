@@ -5,7 +5,7 @@ const ShowImage = ({ imageBase64, timestamp, onClose }) => {
 
   return (
     <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl shadow-2xl w-full max-w-xl border border-slate-700 animate-slideUp flex flex-col">
-      {/* Header */}
+     
       <div className="flex items-center justify-between p-4 border-b border-slate-700">
         <h3 className="text-sm font-semibold text-slate-300">
           🖼️ Generated Diagram
@@ -18,7 +18,7 @@ const ShowImage = ({ imageBase64, timestamp, onClose }) => {
         </button>
       </div>
 
-      {/* Image */}
+     
       <div className="p-4 flex-1 overflow-auto bg-white rounded-b-2xl">
         <img
           src={`data:image/png;base64,${imageBase64}`}
@@ -27,7 +27,7 @@ const ShowImage = ({ imageBase64, timestamp, onClose }) => {
         />
       </div>
 
-      {/* Download */}
+      
       <div className="bg-slate-900 p-3 flex justify-end rounded-b-2xl">
         <a
           href={`data:image/png;base64,${imageBase64}`}

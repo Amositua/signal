@@ -2,18 +2,17 @@ import { useState, useRef, useEffect, useCallback } from "react";
 
 export const useSignalConnection = () => {
   const [socket, setSocket] = useState(null);
-  const [status, setStatus] = useState("DISCONNECTED"); // DISCONNECTED, CONNECTED, LISTENING
+  const [status, setStatus] = useState("DISCONNECTED"); 
   const [signals, setSignals] = useState([]);
   const mediaStreamRef = useRef(null);
-  const shouldStopRef = useRef(false); // Ref to control the loop instantly
+  const shouldStopRef = useRef(false); 
 
-  // 1. Connect to Backend
   // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const connect = useCallback(() => {
-    // Use wss:// for secure production (Render), ws:// for localhost
+   
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const host = window.location.host; // automatically gets 'signal-image-latest.onrender.com'
-    // For local testing: const url = 'ws://localhost:8080/ws-signal';
+    const host = window.location.host; 
+    
     const url = `https://signal-image-latest.onrender.com/ws-signal`;
 
     const ws = new WebSocket(url);
@@ -31,14 +30,14 @@ export const useSignalConnection = () => {
         if (data.type === "IMAGE_GENERATED") {
           console.log("🖼️ Image received! Size:", data.imageBase64.length);
         }
-        // Only add non-IDLE signals to the UI
+        
         if (data.type !== "IDLE") {
-        //   console.log("📩 Signal Receivedddddd:", event);
+       
           console.log("🚨 SIGNAL RECEIVED:", data);
-          // Add new signal to top of list
+         
           setSignals((prev) => [...prev, data]);
 
-          // Optional: Play a subtle notification sound for "INPUT_REQUIRED"
+          
           if (data.type === "INPUT_REQUIRED") {
             console.log("Playing notification sound");
             new Audio("/notification.mp3").play().catch(() => {});
@@ -52,18 +51,16 @@ export const useSignalConnection = () => {
     ws.onclose = () => {
       console.log("❌ Disconnected");
       setStatus("DISCONNECTED");
-      stopListening(); // Safety cleanup
+      stopListening();
     };
 
     setSocket(ws);
   }, []);
 
-  // 2. The "Discrete Loop" Recorder (Fixes 400 Error)
+  
   const recordClip = (stream) => {
     if (shouldStopRef.current || !stream) return;
 
-    // Create a NEW recorder for every 3-second clip
-    // This ensures every blob sent to Gemini has a valid WebM Header
     let mimeType = "";
 
     if (MediaRecorder.isTypeSupported("audio/webm;codecs=opus")) {
@@ -85,19 +82,18 @@ export const useSignalConnection = () => {
     };
 
     recorder.onstop = () => {
-      if (shouldStopRef.current) return; // Stop if user clicked Stop
+      if (shouldStopRef.current) return; 
 
       const blob = new Blob(chunks, { type: "audio/webm" });
 
-      // Send to Backend
+      
       if (blob.size > 0 && socket?.readyState === WebSocket.OPEN) {
         blob.arrayBuffer().then((buffer) => {
           socket.send(buffer);
           console.log(`📤 Sent Clip (${blob.size} bytes)`);
         });
       }
-
-      // RESTART IMMEDIATELY (The Infinite Loop)
+  
       recordClip(stream);
     };
 
@@ -108,13 +104,11 @@ export const useSignalConnection = () => {
     }, 3000);
   };
 
-  // 3. Start Listening
   const startListening = async () => {
     if (!socket) return;
     shouldStopRef.current = false;
 
     try {
-      // Get Tab Audio (preferred) or Microphone
       const stream = await navigator.mediaDevices.getDisplayMedia({
         video: true,
         audio: { echoCancellation: true, noiseSuppression: true },
@@ -127,7 +121,6 @@ export const useSignalConnection = () => {
 
       const audioOnlyStream = new MediaStream(audioTracks);
 
-      // For Microphone only (if you prefer):
       // const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
       mediaStreamRef.current = audioOnlyStream;
@@ -140,9 +133,9 @@ export const useSignalConnection = () => {
     }
   };
 
-  // 4. Stop Listening
+
   const stopListening = () => {
-    shouldStopRef.current = true; // Breaks the loop
+    shouldStopRef.current = true; 
 
     if (mediaStreamRef.current) {
       mediaStreamRef.current.getTracks().forEach((track) => track.stop());
@@ -151,7 +144,6 @@ export const useSignalConnection = () => {
     setStatus("CONNECTED");
   };
 
-  // 5. Send Manual Command (for Gestures)
   const sendCommand = (cmd) => {
     if (socket && socket.readyState === WebSocket.OPEN) {
       socket.send(cmd);
