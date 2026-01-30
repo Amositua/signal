@@ -90,7 +90,7 @@ export const GestureController = ({ onGesture, isReady }) => {
     
     return (
         <div className="fixed bottom-5 right-5 w-48 h-36 rounded-xl overflow-hidden border-2 border-blue-500/50 shadow-2xl bg-black z-50">
-            
+        
             <video 
                 ref={videoRef} 
                 autoPlay 
@@ -105,8 +105,8 @@ export const GestureController = ({ onGesture, isReady }) => {
                     {loaded ? "Vision Active" : "Loading AI..."}
                 </span>
             </div>
+
             
-           
             {isReady && (
                 <div className="absolute bottom-2 left-0 w-full text-center animate-pulse">
                    <span className="text-xs font-bold text-white bg-blue-600 px-2 py-1 rounded-full">

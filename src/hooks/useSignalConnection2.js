@@ -13,7 +13,8 @@ export const useSignalConnection = () => {
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     const host = window.location.host; 
     
-    const url = `https://signal-image-latest.onrender.com/ws-signal`;
+    // const url = `https://signal-image-latest.onrender.com/ws-signal`;
+    const url = `https://signal-backend-854441956422.us-central1.run.app/ws-signal`;
 
     const ws = new WebSocket(url);
 
@@ -143,6 +144,7 @@ export const useSignalConnection = () => {
     }
     setStatus("CONNECTED");
   };
+
 
   const sendCommand = (cmd) => {
     if (socket && socket.readyState === WebSocket.OPEN) {
